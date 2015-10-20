@@ -16,14 +16,31 @@
 
 @implementation ViewController
 
+/*ASSUMPTIONS: 
+ 
+ 1. text property represents a string from a file document. I wasn't sure if reading from the file was part of the requirement. If it is please let me know and I can modify my code. For now text will represent the text obtain from the textfield.
+ 2. Use of Standard data structures and associated methods
+ 3. Need to remove puntuation 
+ 4. Need to convert all words to lower case
+ 5. Need to print words in order based on frequency until maxCount (size of the array returned)
+ 6. We only need to print each word once (no repeated words)
+ 
+ */
+
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
 
-    self.text = @"On a dark desert highway, cool wind in my hair Warm smell of colitas, rising up through the airUp ahead in the distance, I saw a shimmering light My head grew heavy and my sight grew dim I had to stop for the night There she stood in the doorway; I heard the mission bell And I was thinking to myself, This could be Heaven or this could be Hell. Then she lit up a candle and she showed me the way There were voices down the corridor, I thought I heard them say...";
+    self.text = @"Katniss Everdeen, who tells her story in the first person, wakes up. It is the day of the reaping. She sees her little sister, Prim (short for Primrose), asleep in bed with their mother across the room. Katniss puts on her clothes to go hunting. The area where she and her family live is called the Seam, and it’s part of District 12. They are at the edge of the district, which is enclosed by a high fence, and Katniss often crawls under the fence and enters the woods outside, where she forages and hunts. Her father taught her these skills before his death in a mine explosion when she was eleven years old, and she uses a bow he made. Though trespassing in the woods and poaching are illegal, nobody pays attention, and Katniss even sells meat to the Peacekeepers who are supposed to enforce the laws. Most people in the district, she explains, don’t have enough food.";
 
 
     self.wordsDictionary = [NSMutableDictionary new];
+
+  [self mostFrequentWordsFromString:self.text maxCount:2];
+
+
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -46,15 +63,64 @@
  
 */
 
--(NSArray *)mostFrequentWordsFromString:(NSString *)string maxCount:(NSUInteger )maxCount{
+-(NSArray *)mostFrequentWordsFromString:(NSString *)text maxCount:(NSUInteger )maxCount{
 
-    NSMutableArray *wordList = [NSMutableArray array];
+    NSArray *sortedListCopy = [NSArray new];
+
+    //check if the text is empty if, provide a message.
+    if ([text isEqualToString:@""]) {
+
+        NSLog(@"the text was empty");
+
+    }else{
+
+        //remove puntuation. Also need to convert the string received to lower case so all words can be evaluated equally.
 
 
 
+    //Convert the string to an array.
+
+        NSArray *wordsArray = [[[[text componentsSeparatedByCharactersInSet:[[NSCharacterSet letterCharacterSet]invertedSet]]
+                                 componentsJoinedByString:@" "] lowercaseString] componentsSeparatedByString:@" "];
+        NSMutableDictionary *wordsDictionary = [NSMutableDictionary new];
 
 
 
-    return wordList;
+    //iterate through the array of words
+        for (NSString *str in wordsArray){
+
+    //if the word does not exists in the dictionary, we need to add it to the dictionary and set it's initial value to @1;
+
+            if (![wordsDictionary objectForKey:str] && ![str isEqualToString:@""] && wordsDictionary.count != maxCount) {
+
+                [wordsDictionary setObject:@1 forKey:str];
+
+            }else{
+                //get neeed to get he value for that key
+                int value = (int)[[wordsDictionary objectForKey:str] integerValue] + 1;
+
+                //then overide the current value wiht the new value.
+
+                [wordsDictionary setObject:[NSNumber numberWithInt:value] forKey:str];
+
+
+            }
+        }
+
+        [wordsDictionary removeObjectForKey:@""];
+
+        NSLog(@"%@", wordsDictionary);
+
+      NSArray *sortedList = [[[wordsDictionary keysSortedByValueUsingComparator:^NSComparisonResult(id obj1, id obj2) {
+
+            return [obj1 compare:obj2];
+        }] reverseObjectEnumerator] allObjects];
+
+        NSLog(@"%@", sortedList);
+
+    }
+
+
+    return sortedListCopy;
 }
 @end
